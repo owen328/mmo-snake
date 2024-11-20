@@ -1,0 +1,28 @@
+/* client/src/styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.game {
+    text-align: center;
+}
+
+/*.grid {*/
+/*    display: grid;*/
+/*    grid-template-columns: repeat(20, 30px);*/
+/*    grid-template-rows: repeat(20, 30px);*/
+/*    margin: auto;*/
+/*    margin-top: 20px;*/
+/*    width: 600px;*/
+/*    background-color: black;*/
+/*}*/
+
+/*.snake {*/
+/*    background-color: greenyellow;*/
+/*}*/
+
+/*.other-snake {*/
+/*    background-color: orange;*/
+/*}*/
