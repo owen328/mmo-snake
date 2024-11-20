@@ -11,7 +11,7 @@ const App = () => {
     const [started, setStarted] = useState(false);
 
     useEffect(() => {
-        const socketIO = io('http://localhost:3001');
+        const socketIO = io(window.location.host);
 
         setSocket(socketIO);
 

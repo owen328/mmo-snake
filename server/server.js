@@ -5,15 +5,17 @@ import cors from "cors";
 
 
 const app = express();
-app.use(cors())
-
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.get("/", (req, res) => {
+    res.json({
+        status: "success"
+    });
+})
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-    }
-});
+const io = new Server(server);
 
 
 let players = {};
@@ -75,7 +77,7 @@ setInterval(() => {
     // 广播更新后的玩家状态  
     io.emit('updatePlayers', players);
     
-}, 1000);
+}, 200);
 
 
 const PORT = process.env.PORT || 3001;
