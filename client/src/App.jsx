@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {io} from "socket.io-client";
 
 
@@ -6,18 +6,44 @@ const GRID_SIZE = 20;
 
 const App = () => {
 
-    const [players, setPlayers] = useState({});
+    // const [players, setPlayers] = useState({});
     const [socket, setSocket] = useState(null);
     const [started, setStarted] = useState(false);
-
+    const [gridItems, setGridItems] = useState([]);
+    
     useEffect(() => {
         const socketIO = io(window.location.host);
 
         setSocket(socketIO);
 
-        socketIO.on('updatePlayers', (players) => {
-            setPlayers(players);
-            // drawSnake(players);
+        socketIO.on('updateGame', (gameData) => {
+            let tempItems = [];
+            Object.values(gameData.players).forEach(player => {
+                if (!player.is_start) {
+                    if (player.id === socketIO.id){
+                        setStarted(false);
+                    }
+                    return;
+                }
+                player.snake.forEach(({x,y}) => {
+                    tempItems.push({
+                        x: x,
+                        y: y,
+                        class: player.id === socketIO.id ? 'snake' : 'other-snake'
+                    });
+                });
+                
+            });
+            gameData.foods.forEach(food => {
+                tempItems.push({
+                    x: food.x,
+                    y: food.y,
+                    class: 'food',
+                });
+            });
+            
+            setGridItems(tempItems);
+            // setPlayers(gameData.players);
         });
 
         return () => {
@@ -25,7 +51,6 @@ const App = () => {
             socketIO.disconnect();
         }
     }, []);
-    
 
 
     const handleKeyPress = (e) => {
@@ -61,15 +86,25 @@ const App = () => {
             }
         }
     }
-
     useEffect(() => {
 
         window.addEventListener('keydown', handleKeyPress);
+        if (started) {
+            socket.emit('startGame', true);
+        }
         return () => {
             window.removeEventListener('keydown', handleKeyPress);
         };
     }, [socket, started]);
 
+
+    useEffect(() => {
+        return () => {
+            if (started){
+                alert('game over');
+            }
+        }
+    }, [started]);
     // const getCellClass = (row, col) => {
     //
     // }
@@ -108,6 +143,16 @@ const App = () => {
                 width: `${GRID_SIZE * 30}px`,
                 backgroundColor: "black"
             }}>
+                {
+                    gridItems.map((item, k) => {
+                        return (
+                            <div key={k} style={{
+                                gridRowStart: item.y,
+                                gridColumnStart: item.x,
+                            }} className={item.class}></div>
+                        );
+                    })
+                }
                 {/*{[...Array(GRID_SIZE)].map((_, rowIndex) => (*/}
                 {/*    <div key={rowIndex} className="row">*/}
                 {/*        {[...Array(GRID_SIZE)].map((_, colIndex) => (*/}
@@ -116,26 +161,29 @@ const App = () => {
                 {/*    </div>*/}
                 {/*))}*/}
 
-                {
-                    Object.values(players).map((player, i) => {
-                        let backColor;
-                        if (player.id === socket.id) {
-                            backColor = "greenyellow";
-                        } else {
-                            backColor = "orange";
-                        }
-                        return player.snake.map((position, index) => {
-                            const key = i.toString() + index.toString();
-                            // const style = `grid-row-start:${position.y};grid-col-start:${position.x}`;
-                            return (<div style={{
-                                gridRowStart: position.y,
-                                gridColumnStart: position.x,
-                                backgroundColor: backColor
-                            }} className='snake' key={key}></div>);
-                        });
-
-                    })
-                }
+                {/*{*/}
+                {/*    Object.values(players).map((player, i) => {*/}
+                {/*        if (!player.is_start) {*/}
+                {/*            return;*/}
+                {/*        }*/}
+                {/*        let backColor;*/}
+                {/*        if (player.id === socket.id) {*/}
+                {/*            backColor = "greenyellow";*/}
+                {/*        } else {*/}
+                {/*            backColor = "orange";*/}
+                {/*        }*/}
+                {/*        return player.snake.map((position, index) => {*/}
+                {/*            const key = i.toString() + index.toString();*/}
+                {/*            // const style = `grid-row-start:${position.y};grid-col-start:${position.x}`;*/}
+                {/*            return (<div style={{*/}
+                {/*                gridRowStart: position.y,*/}
+                {/*                gridColumnStart: position.x,*/}
+                {/*                backgroundColor: backColor*/}
+                {/*            }} className='snake' key={key}></div>);*/}
+                {/*        });*/}
+                
+                {/*    })*/}
+                {/*}*/}
             </div>
             {!started && <h2>按 Enter 开始游戏</h2>}
         </div>

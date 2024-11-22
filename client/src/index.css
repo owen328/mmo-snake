@@ -19,10 +19,13 @@ body {
 /*    background-color: black;*/
 /*}*/
 
-/*.snake {*/
-/*    background-color: greenyellow;*/
-/*}*/
+.snake {
+    background-color: greenyellow;
+}
 
-/*.other-snake {*/
-/*    background-color: orange;*/
-/*}*/
+.other-snake {
+    background-color: orange;
+}
+.food {
+    background-color: orangered;
+}
