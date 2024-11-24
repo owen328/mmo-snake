@@ -54,6 +54,7 @@ const App = () => {
 
 
     const handleKeyPress = (e) => {
+        e.preventDefault();
         if (e.key === 'Enter' && !started) {
             setStarted(true);
             console.log('Game started'); // 这里也增加一个日志  
